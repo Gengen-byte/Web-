@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>みんツジ | みんなのツジドウ</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="logo">
+      <span class="logo-icon">🌊</span>
+      <div class="logo-text">
+        <span class="logo-title">みんツジ</span>
+        <span class="logo-sub">みんなのツジドウ</span>
+      </div>
+    </div>
+    <p class="app-hint">地図をタップして、辻堂へのメッセージを残そう（24時間で消えます）</p>
+  </header>
+
+  <div id="map"></div>
+
+  <button id="locate-btn" class="locate-btn" type="button" aria-label="現在地から投稿する">
+    <span class="locate-btn-icon">📍</span>
+    <span class="locate-btn-label">現在地から投稿</span>
+  </button>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- 投稿フォーム モーダル -->
+  <div id="post-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <h2>メッセージを投稿</h2>
+      <textarea id="post-text" maxlength="140" placeholder="辻堂での出来事や気持ちを書いてみよう（140文字まで）"></textarea>
+      <div class="char-count"><span id="char-count">0</span>/140</div>
+      <p id="post-error" class="post-error hidden"></p>
+      <div class="modal-actions">
+        <button id="post-cancel" class="btn btn-secondary">キャンセル</button>
+        <button id="post-submit" class="btn btn-primary">投稿する</button>
+      </div>
+    </div>
+  </div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
