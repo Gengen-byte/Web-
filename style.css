@@ -48,7 +48,9 @@ html, body {
 }
 
 .logo-icon {
-  font-size: 28px;
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
 }
 
 .logo-text {
@@ -82,6 +84,45 @@ html, body {
   width: 100%;
   height: 100%;
   z-index: 1;
+  filter: saturate(1.25) brightness(1.03);
+}
+
+.leaflet-tile-pane {
+  filter: contrast(1.02);
+}
+
+/* ズームボタンをポップな見た目に */
+.leaflet-control-zoom {
+  border: none !important;
+  border-radius: var(--radius-md) !important;
+  overflow: hidden;
+  box-shadow: var(--shadow) !important;
+}
+
+.leaflet-control-zoom a {
+  background: #ffffff !important;
+  color: var(--pastel-blue-deep) !important;
+  font-size: 20px !important;
+  font-weight: 800;
+  border: none !important;
+  width: 38px !important;
+  height: 38px !important;
+  line-height: 38px !important;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.leaflet-control-zoom a:hover {
+  background: var(--pastel-yellow) !important;
+}
+
+.leaflet-control-zoom a:active {
+  transform: scale(0.9);
+}
+
+.leaflet-control-attribution {
+  border-radius: var(--radius-sm) 0 0 0 !important;
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(4px);
 }
 
 /* ---------- 投稿モーダル ---------- */
@@ -116,6 +157,41 @@ html, body {
   color: var(--pastel-blue-deep);
 }
 
+.category-picker {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.category-btn {
+  flex: 1;
+  border: 2px solid #d9ecf3;
+  background: #f8fdff;
+  color: #7c93a3;
+  border-radius: 999px;
+  padding: 8px 10px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.category-btn:active {
+  transform: scale(0.96);
+}
+
+.category-btn.active {
+  background: linear-gradient(135deg, var(--pastel-blue), var(--pastel-blue-deep));
+  border-color: var(--pastel-blue-deep);
+  color: #ffffff;
+}
+
+.category-btn[data-category="new_shop"].active {
+  background: linear-gradient(135deg, #ffb6d9, #ffd28a);
+  border-color: #ff9fc7;
+  color: #7a2f4d;
+}
+
 .modal-card textarea {
   width: 100%;
   min-height: 100px;
@@ -138,6 +214,68 @@ html, body {
   font-size: 11px;
   color: #93a8b6;
   margin-top: 4px;
+}
+
+.photo-picker {
+  margin-top: 10px;
+}
+
+.photo-picker-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #eef6f9;
+  color: var(--pastel-blue-deep);
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.photo-picker-label:active {
+  transform: scale(0.96);
+}
+
+.photo-picker-icon {
+  font-size: 15px;
+}
+
+.photo-preview-wrap {
+  position: relative;
+  margin-top: 10px;
+  width: fit-content;
+}
+
+.photo-preview-wrap.hidden {
+  display: none;
+}
+
+.photo-preview {
+  max-width: 100%;
+  max-height: 160px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--pastel-blue);
+  display: block;
+}
+
+.photo-remove {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--pastel-blue);
+  border-radius: 50%;
+  background: #ffffff;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .post-error {
@@ -186,13 +324,121 @@ html, body {
 }
 
 /* ---------- ピン / ポップアップ ---------- */
-.mintsuji-pin {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 26px;
-  filter: drop-shadow(0 3px 4px rgba(60, 100, 120, 0.35));
-  transform: translateY(-4px);
+.mintsuji-bubble-wrap {
+  position: relative;
+}
+
+.mintsuji-bubble {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-50%);
+  max-width: 130px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 2px solid #ffffff;
+  box-shadow: 0 4px 10px rgba(60, 100, 120, 0.3);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+  animation: pin-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mintsuji-bubble::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 11px;
+  height: 11px;
+  background: inherit;
+  border-right: 2px solid #ffffff;
+  border-bottom: 2px solid #ffffff;
+  border-radius: 0 0 3px 0;
+  transform: translateX(-50%) rotate(45deg);
+  z-index: -1;
+}
+
+@keyframes pin-pop {
+  0% { transform: translateX(-50%) scale(0); }
+  70% { transform: translateX(-50%) scale(1.2); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+
+/* 人気ピンの演出 */
+.mintsuji-bubble.is-popular {
+  border-color: #ffe08a;
+  animation: pin-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), glow-popular 1.7s ease-in-out infinite;
+}
+
+@keyframes glow-popular {
+  0%, 100% { box-shadow: 0 4px 10px rgba(60, 100, 120, 0.3), 0 0 0 0 rgba(255, 199, 89, 0.55); }
+  50% { box-shadow: 0 4px 10px rgba(60, 100, 120, 0.3), 0 0 0 6px rgba(255, 199, 89, 0); }
+}
+
+/* 大人気ピンの演出 */
+.mintsuji-bubble.is-hot {
+  border-color: #ffb37a;
+  animation: pin-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), glow-hot 1.3s ease-in-out infinite;
+}
+
+@keyframes glow-hot {
+  0%, 100% {
+    box-shadow: 0 4px 12px rgba(60, 100, 120, 0.3), 0 0 0 0 rgba(255, 128, 100, 0.6);
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    box-shadow: 0 4px 12px rgba(60, 100, 120, 0.3), 0 0 0 7px rgba(255, 128, 100, 0);
+    transform: translateX(-50%) scale(1.06);
+  }
+}
+
+.mintsuji-bubble-badge {
+  position: absolute;
+  top: -14px;
+  right: -8px;
+  font-size: 15px;
+  animation: badge-wiggle 1.3s ease-in-out infinite;
+}
+
+.mintsuji-bubble-photo-badge {
+  position: absolute;
+  top: -14px;
+  left: -8px;
+  font-size: 14px;
+}
+
+@keyframes badge-wiggle {
+  0%, 100% { transform: rotate(-8deg) scale(1); }
+  50% { transform: rotate(8deg) scale(1.15); }
+}
+
+/* 新店オープン カテゴリの演出（人気演出より優先） */
+.mintsuji-bubble.category-new-shop {
+  background: linear-gradient(135deg, #ffd7ea, #ffe6a8);
+  border-color: #ff9fc7;
+  color: #7a2f4d;
+  animation: pin-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), glow-new-shop 1.8s ease-in-out infinite;
+}
+
+@keyframes glow-new-shop {
+  0%, 100% { box-shadow: 0 4px 10px rgba(60, 100, 120, 0.3), 0 0 0 0 rgba(255, 159, 199, 0.6); }
+  50% { box-shadow: 0 4px 10px rgba(60, 100, 120, 0.3), 0 0 0 7px rgba(255, 159, 199, 0); }
+}
+
+.popup-category-tag {
+  display: inline-block;
+  background: #fff0f8;
+  color: #c2447a;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 999px;
+  margin-bottom: 8px;
 }
 
 .leaflet-popup-content-wrapper {
@@ -204,6 +450,15 @@ html, body {
   border-radius: var(--radius-md);
   padding: 12px 14px 10px;
   min-width: 200px;
+}
+
+.mintsuji-popup .popup-photo {
+  display: block;
+  width: 100%;
+  max-height: 160px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
 }
 
 .mintsuji-popup .popup-text {
@@ -339,4 +594,48 @@ html, body {
   background: var(--pastel-blue-deep);
   border: 3px solid #ffffff;
   box-shadow: 0 0 0 4px rgba(123, 184, 212, 0.35);
+  position: relative;
+}
+
+.current-location-dot::after {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+  background: rgba(123, 184, 212, 0.35);
+  animation: locate-ring 1.8s ease-out infinite;
+}
+
+@keyframes locate-ring {
+  0% { transform: scale(0.5); opacity: 0.8; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+/* ---------- 周辺施設: 学校アイコン ---------- */
+.school-marker {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  box-shadow: 0 3px 8px rgba(60, 100, 120, 0.3);
+  border: 2px solid;
+}
+
+.school-marker.school-elementary {
+  border-color: #ffb347;
+}
+
+.school-marker.school-junior-high {
+  border-color: #8a7fd1;
+}
+
+.school-popup {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  padding: 2px 4px;
 }

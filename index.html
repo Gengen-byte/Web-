@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -12,7 +13,7 @@
 
   <header class="app-header">
     <div class="logo">
-      <span class="logo-icon">🌊</span>
+      <img src="logo.svg" class="logo-icon" alt="みんツジのマスコットロゴ">
       <div class="logo-text">
         <span class="logo-title">みんツジ</span>
         <span class="logo-sub">みんなのツジドウ</span>
@@ -34,8 +35,27 @@
   <div id="post-modal" class="modal-overlay hidden">
     <div class="modal-card">
       <h2>メッセージを投稿</h2>
+
+      <div class="category-picker" role="group" aria-label="投稿カテゴリを選択">
+        <button type="button" class="category-btn active" data-category="normal">📝 通常の投稿</button>
+        <button type="button" class="category-btn" data-category="new_shop">🎉 新店オープン</button>
+      </div>
+
       <textarea id="post-text" maxlength="140" placeholder="辻堂での出来事や気持ちを書いてみよう（140文字まで）"></textarea>
       <div class="char-count"><span id="char-count">0</span>/140</div>
+
+      <div id="photo-picker" class="photo-picker">
+        <label for="post-photo" class="photo-picker-label">
+          <span class="photo-picker-icon">📷</span>
+          <span>写真を追加（任意）</span>
+        </label>
+        <input type="file" id="post-photo" accept="image/*" hidden>
+      </div>
+      <div id="photo-preview-wrap" class="photo-preview-wrap hidden">
+        <img id="photo-preview" class="photo-preview" alt="投稿する写真のプレビュー">
+        <button id="photo-remove" type="button" class="photo-remove" aria-label="写真を削除">✕</button>
+      </div>
+
       <p id="post-error" class="post-error hidden"></p>
       <div class="modal-actions">
         <button id="post-cancel" class="btn btn-secondary">キャンセル</button>
