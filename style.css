@@ -44,31 +44,12 @@ html, body {
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
 }
 
 .logo-icon {
-  width: 46px;
-  height: 46px;
+  height: 64px;
+  width: auto;
   flex-shrink: 0;
-}
-
-.logo-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.1;
-}
-
-.logo-title {
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--pastel-blue-deep);
-  letter-spacing: 0.5px;
-}
-
-.logo-sub {
-  font-size: 11px;
-  color: #7c93a3;
 }
 
 .app-hint {
