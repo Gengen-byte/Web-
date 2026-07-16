@@ -484,6 +484,7 @@ html, body {
 
 .mintsuji-popup .popup-reactions {
   display: flex;
+  align-items: center;
   gap: 8px;
 }
 
@@ -508,6 +509,24 @@ html, body {
 .reaction-count {
   font-weight: 700;
   color: var(--pastel-blue-deep);
+}
+
+.popup-delete-btn {
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.75);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #c9557a;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(90, 130, 150, 0.2);
+  transition: transform 0.1s ease;
+  margin-left: auto;
+}
+
+.popup-delete-btn:active {
+  transform: scale(0.92);
 }
 
 /* Leafletデフォルトのマーカー影の位置微調整 */

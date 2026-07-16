@@ -156,6 +156,9 @@ function popupHtml(post) {
   const photoHtml = post.photo
     ? `<img class="popup-photo" src="${post.photo}" alt="投稿された写真">`
     : '';
+  const deleteHtml = myPostIds.has(post.id)
+    ? `<button class="popup-delete-btn" data-id="${post.id}" aria-label="投稿を削除">🗑 削除</button>`
+    : '';
   return `
     <div class="mintsuji-popup" style="background:${bg}">
       ${categoryTag}
@@ -165,6 +168,7 @@ function popupHtml(post) {
       <div class="popup-reactions">
         <button class="reaction-btn" data-id="${post.id}" data-type="hokkori">😊 <span class="reaction-count">${post.reactions.hokkori}</span></button>
         <button class="reaction-btn" data-id="${post.id}" data-type="iine">🌊 <span class="reaction-count">${post.reactions.iine}</span></button>
+        ${deleteHtml}
       </div>
     </div>
   `;
@@ -361,6 +365,30 @@ function attachReactionHandlers(marker, postId) {
       reactToPost(postId, btn.dataset.type);
     };
   });
+  const deleteBtn = el.querySelector('.popup-delete-btn');
+  if (deleteBtn) {
+    deleteBtn.onclick = (event) => {
+      event.stopPropagation();
+      deletePost(postId);
+    };
+  }
+}
+
+function deletePost(id) {
+  if (!confirm('この投稿を削除しますか？この操作は取り消せません。')) return;
+
+  posts = posts.filter((p) => p.id !== id);
+  savePosts();
+  myPostIds.delete(id);
+  saveMyPostIds();
+
+  const marker = markersById.get(id);
+  if (marker) {
+    map.removeLayer(marker);
+    markersById.delete(id);
+  }
+
+  showToast('投稿を削除しました。');
 }
 
 function reactToPost(id, type) {
