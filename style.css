@@ -158,13 +158,13 @@ html, body {
 }
 
 .category-picker {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 8px;
   margin-bottom: 12px;
 }
 
 .category-btn {
-  flex: 1;
   border: 2px solid #d9ecf3;
   background: #f8fdff;
   color: #7c93a3;
@@ -190,6 +190,18 @@ html, body {
   background: linear-gradient(135deg, #ffb6d9, #ffd28a);
   border-color: #ff9fc7;
   color: #7a2f4d;
+}
+
+.category-btn[data-category="notice"].active {
+  background: linear-gradient(135deg, #ffcf6e, #ff9f5a);
+  border-color: #ff9f43;
+  color: #5c3400;
+}
+
+.category-btn[data-category="event"].active {
+  background: linear-gradient(135deg, #b39dff, #8ecbff);
+  border-color: #8b6bff;
+  color: #2a1b66;
 }
 
 .modal-card textarea {
@@ -428,6 +440,20 @@ html, body {
 @keyframes glow-new-shop {
   0%, 100% { box-shadow: 0 4px 10px rgba(60, 100, 120, 0.3), 0 0 0 0 rgba(255, 159, 199, 0.6); }
   50% { box-shadow: 0 4px 10px rgba(60, 100, 120, 0.3), 0 0 0 7px rgba(255, 159, 199, 0); }
+}
+
+/* お知らせ・注意 カテゴリの演出 */
+.mintsuji-bubble.category-notice {
+  background: linear-gradient(135deg, #ffe6b0, #ffcf7a);
+  border-color: #ff9f43;
+  color: #5c3400;
+}
+
+/* イベント カテゴリの演出 */
+.mintsuji-bubble.category-event {
+  background: linear-gradient(135deg, #d6c6ff, #aee0ff);
+  border-color: #8b6bff;
+  color: #2a1b66;
 }
 
 .popup-category-tag {

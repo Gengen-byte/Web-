@@ -12,13 +12,31 @@ const TSUJIDO_BOUNDS = L.latLngBounds([35.315, 139.428], [35.351, 139.468]);
 const POPULAR_THRESHOLD = 3; // このリアクション数から「人気ピン」演出
 const HOT_THRESHOLD = 8;     // このリアクション数から「大人気ピン」演出
 
-const CATEGORY_EXPIRY_MS = {
-  normal: EXPIRY_MS,
-  new_shop: EXPIRY_MS * 7, // 新店オープンは7日間表示
+const CATEGORY_META = {
+  normal: { emoji: '📝', label: '通常の投稿', expiryMs: EXPIRY_MS },
+  new_shop: {
+    emoji: '🎉', label: '新店オープン', expiryMs: EXPIRY_MS * 7, // 新店オープンは7日間表示
+    bubbleClass: 'category-new-shop', tagBg: '#fff0f8', tagColor: '#c2447a',
+    gradient: 'linear-gradient(135deg, #ffe3f3, #ffe9b8)',
+  },
+  notice: {
+    emoji: '⚠️', label: 'お知らせ・注意', expiryMs: EXPIRY_MS * 3, // 道路工事や混雑情報などは3日間表示
+    bubbleClass: 'category-notice', tagBg: '#fff3d6', tagColor: '#8a5a00',
+    gradient: 'linear-gradient(135deg, #ffe6b0, #ffcf7a)',
+  },
+  event: {
+    emoji: '🎪', label: 'イベント', expiryMs: EXPIRY_MS * 7, // 祭り・花火大会などは7日間表示
+    bubbleClass: 'category-event', tagBg: '#eee7ff', tagColor: '#5b3ea8',
+    gradient: 'linear-gradient(135deg, #d6c6ff, #aee0ff)',
+  },
 };
 
+function categoryMeta(post) {
+  return CATEGORY_META[post.category] || CATEGORY_META.normal;
+}
+
 function postExpiryMs(post) {
-  return CATEGORY_EXPIRY_MS[post.category] || EXPIRY_MS;
+  return categoryMeta(post).expiryMs;
 }
 
 /* ---------- 安全フィルター ---------- */
@@ -115,9 +133,9 @@ function escapeHtml(str) {
 function ageAlpha(createdAt) {
   const ageHours = (Date.now() - createdAt) / 3600000;
   if (ageHours < 1) return 0.95;   // 0〜1時間: 不透明度（高）
-  if (ageHours < 6) return 0.72;   // 1〜6時間: 不透明度（中）
-  if (ageHours < 12) return 0.48;  // 6〜12時間: 不透明度（低）
-  return 0.24;                     // 12〜24時間: 不透明度（ごく低）
+  if (ageHours < 6) return 0.8;    // 1〜6時間: 不透明度（中）
+  if (ageHours < 12) return 0.65;  // 6〜12時間: 不透明度（低）
+  return 0.5;                      // 12〜24時間: 不透明度（低いが視認可能）
 }
 
 function formatElapsed(createdAt) {
@@ -129,11 +147,12 @@ function formatElapsed(createdAt) {
 }
 
 function popupHtml(post) {
-  const isNewShop = post.category === 'new_shop';
-  const bg = isNewShop
-    ? 'linear-gradient(135deg, #ffe3f3, #ffe9b8)'
-    : `rgba(163, 216, 244, ${ageAlpha(post.createdAt)})`;
-  const categoryTag = isNewShop ? '<div class="popup-category-tag">🎉 新店オープン</div>' : '';
+  const meta = categoryMeta(post);
+  const isSpecial = post.category !== 'normal';
+  const bg = isSpecial ? meta.gradient : `rgba(163, 216, 244, ${ageAlpha(post.createdAt)})`;
+  const categoryTag = isSpecial
+    ? `<div class="popup-category-tag" style="background:${meta.tagBg};color:${meta.tagColor}">${meta.emoji} ${meta.label}</div>`
+    : '';
   const photoHtml = post.photo
     ? `<img class="popup-photo" src="${post.photo}" alt="投稿された写真">`
     : '';
@@ -309,14 +328,15 @@ function popularityClass(post) {
 }
 
 function bubbleIcon(post) {
-  const isNewShop = post.category === 'new_shop';
+  const meta = categoryMeta(post);
+  const isSpecial = post.category !== 'normal';
   const popularClass = popularityClass(post);
-  const categoryClass = isNewShop ? 'category-new-shop' : '';
-  const bgStyle = isNewShop ? '' : `background:rgba(163, 216, 244, ${ageAlpha(post.createdAt)});`;
+  const categoryClass = isSpecial ? meta.bubbleClass : '';
+  const bgStyle = isSpecial ? '' : `background:rgba(163, 216, 244, ${ageAlpha(post.createdAt)});`;
   const hotBadge = popularClass === 'is-hot' ? '<span class="mintsuji-bubble-badge">🔥</span>' : '';
   const photoBadge = post.photo ? '<span class="mintsuji-bubble-photo-badge">📷</span>' : '';
   const previewText = escapeHtml(bubblePreview(post.text));
-  const displayText = isNewShop ? `🎉 ${previewText}` : previewText;
+  const displayText = isSpecial ? `${meta.emoji} ${previewText}` : previewText;
   return L.divIcon({
     className: '',
     html: `

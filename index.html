@@ -3,8 +3,20 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>みんツジ | みんなのツジドウ</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0C447C">
+
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+
+<!-- iOS Safari の「ホーム画面に追加」対応 -->
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="みんツジ">
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="style.css">
@@ -39,6 +51,8 @@
       <div class="category-picker" role="group" aria-label="投稿カテゴリを選択">
         <button type="button" class="category-btn active" data-category="normal">📝 通常の投稿</button>
         <button type="button" class="category-btn" data-category="new_shop">🎉 新店オープン</button>
+        <button type="button" class="category-btn" data-category="notice">⚠️ お知らせ・注意</button>
+        <button type="button" class="category-btn" data-category="event">🎪 イベント</button>
       </div>
 
       <textarea id="post-text" maxlength="140" placeholder="辻堂での出来事や気持ちを書いてみよう（140文字まで）"></textarea>
@@ -68,3 +82,4 @@
 <script src="script.js"></script>
 </body>
 </html>
+
