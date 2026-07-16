@@ -4,8 +4,37 @@
    みんツジ - みんなのツジドウ プロトタイプ
    ========================================================= */
 
-const STORAGE_KEY = 'mintsuji_posts_v1';
-const MY_POSTS_KEY = 'mintsuji_my_posts_v1';
+/* ---------- Firebase ---------- */
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCUy27zgh1RzAm7Fr7Xggv71JgVsYHCjTA",
+  authDomain: "mintsuji-3ce75.firebaseapp.com",
+  projectId: "mintsuji-3ce75",
+  storageBucket: "mintsuji-3ce75.firebasestorage.app",
+  messagingSenderId: "240674296609",
+  appId: "1:240674296609:web:685039729d31922bfca460",
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
+const postsCollection = db.collection('posts');
+
+let currentUid = null;
+const authReady = auth.signInAnonymously()
+  .then(() => new Promise((resolve) => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        currentUid = user.uid;
+        unsubscribe();
+        resolve();
+      }
+    });
+  }))
+  .catch((e) => {
+    console.error('匿名認証に失敗しました', e);
+    showToast('サーバーへの接続に失敗しました。時間をおいて再読み込みしてください。');
+  });
+
 const EXPIRY_MS = 24 * 60 * 60 * 1000; // 24時間でタイムカプセル消滅
 const TSUJIDO_CENTER = [35.3331, 139.4459];
 const TSUJIDO_BOUNDS = L.latLngBounds([35.315, 139.428], [35.351, 139.468]);
@@ -35,10 +64,6 @@ function categoryMeta(post) {
   return CATEGORY_META[post.category] || CATEGORY_META.normal;
 }
 
-function postExpiryMs(post) {
-  return categoryMeta(post).expiryMs;
-}
-
 /* ---------- 安全フィルター ---------- */
 
 function checkSafety(text) {
@@ -65,61 +90,24 @@ function checkSafety(text) {
   return { ok: true };
 }
 
-/* ---------- localStorage 永続化 ---------- */
+/* ---------- 投稿データ（Firestoreで全端末共有） ---------- */
 
-function loadPosts() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch (e) {
-    console.warn('投稿データの読み込みに失敗しました', e);
-    return [];
-  }
-}
+let posts = [];
+const previousReactionTotals = new Map();
 
-function savePosts() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
-  } catch (e) {
-    console.warn('投稿データの保存に失敗しました', e);
-    showToast('保存容量の上限のため、投稿を保存できませんでした。写真サイズを小さくして再度お試しください。');
-  }
-}
-
-let posts = loadPosts();
-
-/* ---------- 自分の投稿の記録（リアクション通知用） ---------- */
-
-function loadMyPostIds() {
-  try {
-    const raw = localStorage.getItem(MY_POSTS_KEY);
-    return new Set(raw ? JSON.parse(raw) : []);
-  } catch (e) {
-    return new Set();
-  }
-}
-
-function saveMyPostIds() {
-  localStorage.setItem(MY_POSTS_KEY, JSON.stringify([...myPostIds]));
-}
-
-const myPostIds = loadMyPostIds();
-
-function pruneExpired() {
+function pruneExpiredLocal() {
   const now = Date.now();
-  const before = posts.length;
-  posts = posts.filter((p) => now - p.createdAt < postExpiryMs(p));
-  if (posts.length !== before) savePosts();
-
-  const remainingIds = new Set(posts.map((p) => p.id));
-  let myPostIdsChanged = false;
-  myPostIds.forEach((id) => {
-    if (!remainingIds.has(id)) {
-      myPostIds.delete(id);
-      myPostIdsChanged = true;
+  const stillValid = [];
+  posts.forEach((post) => {
+    if (now >= post.expiresAt) {
+      removeMarkerById(post.id);
+      previousReactionTotals.delete(post.id);
+      postsCollection.doc(post.id).delete().catch(() => {});
+    } else {
+      stillValid.push(post);
     }
   });
-  if (myPostIdsChanged) saveMyPostIds();
+  posts = stillValid;
 }
 
 /* ---------- 表示ヘルパー ---------- */
@@ -156,7 +144,7 @@ function popupHtml(post) {
   const photoHtml = post.photo
     ? `<img class="popup-photo" src="${post.photo}" alt="投稿された写真">`
     : '';
-  const deleteHtml = myPostIds.has(post.id)
+  const deleteHtml = post.ownerId === currentUid
     ? `<button class="popup-delete-btn" data-id="${post.id}" aria-label="投稿を削除">🗑 削除</button>`
     : '';
   return `
@@ -376,35 +364,20 @@ function attachReactionHandlers(marker, postId) {
 
 function deletePost(id) {
   if (!confirm('この投稿を削除しますか？この操作は取り消せません。')) return;
-
-  posts = posts.filter((p) => p.id !== id);
-  savePosts();
-  myPostIds.delete(id);
-  saveMyPostIds();
-
-  const marker = markersById.get(id);
-  if (marker) {
-    map.removeLayer(marker);
-    markersById.delete(id);
-  }
-
-  showToast('投稿を削除しました。');
+  postsCollection.doc(id).delete().catch((e) => {
+    console.error('削除に失敗しました', e);
+    showToast('削除に失敗しました。もう一度お試しください。');
+  });
 }
 
 function reactToPost(id, type) {
-  const post = posts.find((p) => p.id === id);
-  if (!post) return;
-  post.reactions[type] += 1;
-  savePosts();
-  const marker = markersById.get(id);
-  if (marker) {
-    marker.setPopupContent(popupHtml(post));
-    attachReactionHandlers(marker, id);
-    marker.setIcon(bubbleIcon(post));
-  }
-  if (myPostIds.has(id)) {
-    showToast('🎉 あなたの投稿にリアクションが届きました！');
-  }
+  if (!currentUid) return;
+  postsCollection.doc(id).update({
+    [`reactions.${type}`]: firebase.firestore.FieldValue.increment(1),
+  }).catch((e) => {
+    console.error('リアクションの送信に失敗しました', e);
+    showToast('リアクションを送信できませんでした。');
+  });
 }
 
 function addMarker(post) {
@@ -414,41 +387,76 @@ function addMarker(post) {
   markersById.set(post.id, marker);
 }
 
-function renderAll() {
-  markersById.forEach((m) => map.removeLayer(m));
-  markersById.clear();
-  posts.forEach(addMarker);
+function removeMarkerById(id) {
+  const marker = markersById.get(id);
+  if (marker) {
+    map.removeLayer(marker);
+    markersById.delete(id);
+  }
 }
 
-/* ---------- タイムカプセル：定期更新 ---------- */
+function upsertMarkerFromPost(post) {
+  const existing = markersById.get(post.id);
+  if (!existing) {
+    addMarker(post);
+    return;
+  }
+  existing.setIcon(bubbleIcon(post));
+  existing.setPopupContent(popupHtml(post));
+  if (existing.isPopupOpen()) attachReactionHandlers(existing, post.id);
+}
 
-function refreshCapsules() {
-  const beforeIds = new Set(posts.map((p) => p.id));
-  pruneExpired();
-  const afterIds = new Set(posts.map((p) => p.id));
+/* ---------- タイムカプセル：Firestoreリアルタイム同期 ---------- */
 
-  beforeIds.forEach((id) => {
-    if (!afterIds.has(id)) {
-      const marker = markersById.get(id);
-      if (marker) {
-        map.removeLayer(marker);
-        markersById.delete(id);
+function handleSnapshot(snapshot) {
+  const now = Date.now();
+  const expiredIds = [];
+
+  snapshot.docChanges().forEach((change) => {
+    const post = change.doc.data();
+
+    if (change.type === 'removed') {
+      removeMarkerById(post.id);
+      posts = posts.filter((p) => p.id !== post.id);
+      previousReactionTotals.delete(post.id);
+      return;
+    }
+
+    if (now >= post.expiresAt) {
+      removeMarkerById(post.id);
+      posts = posts.filter((p) => p.id !== post.id);
+      expiredIds.push(post.id);
+      return;
+    }
+
+    const idx = posts.findIndex((p) => p.id === post.id);
+    if (idx >= 0) posts[idx] = post; else posts.push(post);
+
+    if (post.ownerId === currentUid) {
+      const total = post.reactions.hokkori + post.reactions.iine;
+      const prevTotal = previousReactionTotals.get(post.id);
+      if (prevTotal !== undefined && total > prevTotal) {
+        showToast('🎉 あなたの投稿にリアクションが届きました！');
       }
+      previousReactionTotals.set(post.id, total);
     }
+
+    upsertMarkerFromPost(post);
   });
 
-  markersById.forEach((marker, id) => {
-    const post = posts.find((p) => p.id === id);
-    if (!post) return;
-    marker.setIcon(bubbleIcon(post));
-    if (marker.isPopupOpen()) {
-      marker.setPopupContent(popupHtml(post));
-      attachReactionHandlers(marker, id);
-    }
+  expiredIds.forEach((id) => {
+    postsCollection.doc(id).delete().catch(() => {});
   });
 }
 
-setInterval(refreshCapsules, 60 * 1000);
+authReady.then(() => {
+  postsCollection.onSnapshot(handleSnapshot, (e) => {
+    console.error('投稿データの購読に失敗しました', e);
+    showToast('投稿データの取得に失敗しました。ネットワークをご確認ください。');
+  });
+});
+
+setInterval(pruneExpiredLocal, 60 * 1000);
 
 /* ---------- トースト通知 ---------- */
 
@@ -647,7 +655,7 @@ modal.addEventListener('click', (e) => {
   if (e.target === modal) closeModal();
 });
 
-postSubmit.addEventListener('click', () => {
+postSubmit.addEventListener('click', async () => {
   const text = postText.value.trim();
 
   if (!text) {
@@ -665,26 +673,35 @@ postSubmit.addEventListener('click', () => {
     return;
   }
 
+  await authReady;
+  if (!currentUid) {
+    showError('サーバーへの接続に失敗しました。時間をおいて再度お試しください。');
+    return;
+  }
+
+  const createdAt = Date.now();
+  const category = pendingCategory;
   const post = {
-    id: `p_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    id: `p_${createdAt}_${Math.random().toString(36).slice(2, 8)}`,
     lat: pendingLatLng.lat,
     lng: pendingLatLng.lng,
     text,
     photo: pendingPhotoDataUrl,
-    category: pendingCategory,
-    createdAt: Date.now(),
+    category,
+    createdAt,
+    expiresAt: createdAt + CATEGORY_META[category].expiryMs,
+    ownerId: currentUid,
     reactions: { hokkori: 0, iine: 0 },
   };
 
-  posts.push(post);
-  savePosts();
-  myPostIds.add(post.id);
-  saveMyPostIds();
-  addMarker(post);
-  closeModal();
+  postSubmit.disabled = true;
+  try {
+    await postsCollection.doc(post.id).set(post);
+    closeModal();
+  } catch (e) {
+    console.error('投稿に失敗しました', e);
+    showError('投稿に失敗しました。ネットワークをご確認のうえ、もう一度お試しください。');
+  } finally {
+    postSubmit.disabled = false;
+  }
 });
-
-/* ---------- 初期化 ---------- */
-
-pruneExpired();
-renderAll();
