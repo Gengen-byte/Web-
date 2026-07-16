@@ -26,7 +26,7 @@
 <meta name="apple-mobile-web-app-title" content="みんツジ">
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 
@@ -44,7 +44,25 @@
     <span class="locate-btn-label">現在地から投稿</span>
   </button>
 
+  <button id="share-btn" class="share-btn" type="button" aria-label="みんツジを共有する">
+    <span class="share-btn-icon">🔗</span>
+    <span class="share-btn-label">共有</span>
+  </button>
+
   <div id="toast" class="toast hidden"></div>
+
+  <!-- 共有用QRコード モーダル -->
+  <div id="share-modal" class="modal-overlay hidden">
+    <div class="modal-card share-card">
+      <h2>みんツジを共有</h2>
+      <p class="share-desc">QRコードを読み取ると、みんツジをスマホで開けます。</p>
+      <img class="share-qr" src="qr-code.png" alt="みんツジのQRコード">
+      <p class="share-url">https://gengen-byte.github.io/Web-/</p>
+      <div class="modal-actions">
+        <button id="share-close" class="btn btn-secondary">閉じる</button>
+      </div>
+    </div>
+  </div>
 
   <!-- 投稿フォーム モーダル -->
   <div id="post-modal" class="modal-overlay hidden">
@@ -80,11 +98,13 @@
       </div>
 
 
+
+
     </div>
   </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="script.js?v=3"></script>
+<script src="script.js?v=4"></script>
 </body>
 </html>
 

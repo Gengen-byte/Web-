@@ -519,6 +519,18 @@ function handleLocateClick() {
 
 locateBtn.addEventListener('click', handleLocateClick);
 
+/* ---------- 共有QRモーダル ---------- */
+
+const shareBtn = document.getElementById('share-btn');
+const shareModal = document.getElementById('share-modal');
+const shareClose = document.getElementById('share-close');
+
+shareBtn.addEventListener('click', () => shareModal.classList.remove('hidden'));
+shareClose.addEventListener('click', () => shareModal.classList.add('hidden'));
+shareModal.addEventListener('click', (e) => {
+  if (e.target === shareModal) shareModal.classList.add('hidden');
+});
+
 /* ---------- 投稿モーダル ---------- */
 
 const modal = document.getElementById('post-modal');
