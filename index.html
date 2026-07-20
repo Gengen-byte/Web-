@@ -26,30 +26,95 @@
 <meta name="apple-mobile-web-app-title" content="みんツジ">
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link rel="stylesheet" href="style.css?v=4">
+<link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
 
-  <header class="app-header">
-    <div class="logo">
-      <img src="logo.png" class="logo-icon" alt="みんツジ | みんなのツジドウ">
-    </div>
-    <p class="app-hint">地図をタップして、辻堂へのメッセージを残そう（24時間で消えます）</p>
-  </header>
+  <h1 class="visually-hidden">みんツジ | 辻堂の今を地図でつなぐアプリ</h1>
 
-  <div id="map"></div>
+  <div class="app-view">
+    <header class="app-header">
+      <div class="logo">
+        <img src="logo.png" class="logo-icon" alt="みんツジ | みんなのツジドウ">
+      </div>
+      <p class="app-hint">地図をタップして、辻堂へのメッセージを残そう（24時間で消えます）</p>
+      <nav class="app-header-links" aria-label="サイト内リンク">
+        <a href="#about">みんツジとは</a>
+        <span aria-hidden="true">・</span>
+        <a href="#faq">よくある質問</a>
+      </nav>
+    </header>
 
-  <button id="locate-btn" class="locate-btn" type="button" aria-label="現在地から投稿する">
-    <span class="locate-btn-icon">📍</span>
-    <span class="locate-btn-label">現在地から投稿</span>
-  </button>
+    <div id="map"></div>
 
-  <button id="share-btn" class="share-btn" type="button" aria-label="みんツジを共有する">
-    <span class="share-btn-icon">🔗</span>
-    <span class="share-btn-label">QR</span>
-  </button>
+    <button id="locate-btn" class="locate-btn" type="button" aria-label="現在地から投稿する">
+      <span class="locate-btn-icon">📍</span>
+      <span class="locate-btn-label">現在地から投稿</span>
+    </button>
+
+    <button id="share-btn" class="share-btn" type="button" aria-label="みんツジを共有する">
+      <span class="share-btn-icon">🔗</span>
+      <span class="share-btn-label">QR</span>
+    </button>
+  </div>
 
   <div id="toast" class="toast hidden"></div>
+
+  <main class="info-main">
+    <section id="about" class="info-section">
+      <h2>みんツジとは</h2>
+      <p>「みんツジ」は、辻堂の"今"を地図でゆるくシェアできるメッセージアプリです。</p>
+      <p>地図上の気になる場所をタップするだけで、メッセージを投稿できます。
+        「海がきれいだった」「このお店おすすめ」「近くでお祭りやってる」――
+        そんな辻堂の何気ない瞬間を、地域のみんなで共有できます。</p>
+      <p>投稿は24時間で少しずつ薄れて消えていくので、いつも「今の辻堂」を
+        のぞいている感覚で楽しめます。個人情報や不適切な投稿は自動でブロック
+        されるので、安心して気軽に投稿できます。</p>
+      <p>辻堂に住んでいる人も、たまに訪れる人も、ぜひ地図を開いて
+        「今の辻堂」を覗いてみてください。</p>
+    </section>
+
+    <section id="faq" class="info-section">
+      <h2>よくある質問</h2>
+
+      <div class="faq-item">
+        <h3>Q. 個人情報は大丈夫？</h3>
+        <p>A. 電話番号や住所、氏名などの個人情報らしき内容は、投稿時に自動で
+          検知してブロックする仕組みになっています。安心して投稿してください。</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Q. 投稿はいつまで見られる？</h3>
+        <p>A. 投稿から24時間が経過すると、自動的に表示が消えます。
+          「今の辻堂」をシェアする、その場限りの気軽な投稿を楽しむアプリです。</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Q. 会員登録は必要？</h3>
+        <p>A. いいえ、必要ありません。ログイン画面などは表示されず、
+          匿名のまま気軽に投稿・閲覧できます。</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Q. 投稿を削除したい場合は？</h3>
+        <p>A. 自分で投稿した内容は、削除することができます。ただし、
+          投稿した際に使用した端末からのみ削除が可能です（別の端末や
+          ブラウザからは削除できませんのでご注意ください）。</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Q. どんな内容を投稿していいの？</h3>
+        <p>A. 辻堂に関する話題であれば基本的に自由です。ただし、誹謗中傷や
+          個人情報を含む投稿、違法な内容は禁止されており、フィルターで
+          自動的にブロックされます。</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Q. 費用はかかりますか？</h3>
+        <p>A. 無料でご利用いただけます。</p>
+      </div>
+    </section>
+  </main>
 
   <!-- 共有用QRコード モーダル -->
   <div id="share-modal" class="modal-overlay hidden">
@@ -107,7 +172,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-<script src="script.js?v=5"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="script.js?v=6"></script>
 
 
 

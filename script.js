@@ -49,12 +49,12 @@ const CATEGORY_META = {
     gradient: 'linear-gradient(135deg, #ffe3f3, #ffe9b8)',
   },
   notice: {
-    emoji: '⚠️', label: 'お知らせ・注意', expiryMs: EXPIRY_MS * 3, // 道路工事や混雑情報などは3日間表示
+    emoji: '⚠️', label: 'お知らせ・注意', expiryMs: EXPIRY_MS, // 24時間で消滅
     bubbleClass: 'category-notice', tagBg: '#fff3d6', tagColor: '#8a5a00',
     gradient: 'linear-gradient(135deg, #ffe6b0, #ffcf7a)',
   },
   event: {
-    emoji: '🎪', label: 'イベント', expiryMs: EXPIRY_MS * 7, // 祭り・花火大会などは7日間表示
+    emoji: '🎪', label: 'イベント', expiryMs: EXPIRY_MS, // 24時間で消滅
     bubbleClass: 'category-event', tagBg: '#eee7ff', tagColor: '#5b3ea8',
     gradient: 'linear-gradient(135deg, #d6c6ff, #aee0ff)',
   },
@@ -156,6 +156,7 @@ function popupHtml(post) {
       <div class="popup-reactions">
         <button class="reaction-btn" data-id="${post.id}" data-type="hokkori">😊 <span class="reaction-count">${post.reactions.hokkori}</span></button>
         <button class="reaction-btn" data-id="${post.id}" data-type="iine">🌊 <span class="reaction-count">${post.reactions.iine}</span></button>
+        <button class="popup-share-btn" data-id="${post.id}" aria-label="投稿をシェア">📤 シェア</button>
         ${deleteHtml}
       </div>
     </div>
@@ -360,6 +361,13 @@ function attachReactionHandlers(marker, postId) {
       deletePost(postId);
     };
   }
+  const shareBtn = el.querySelector('.popup-share-btn');
+  if (shareBtn) {
+    shareBtn.onclick = (event) => {
+      event.stopPropagation();
+      handleShareClick(postId, shareBtn);
+    };
+  }
 }
 
 function deletePost(id) {
@@ -378,6 +386,114 @@ function reactToPost(id, type) {
     console.error('リアクションの送信に失敗しました', e);
     showToast('リアクションを送信できませんでした。');
   });
+}
+
+/* ---------- 投稿シェア（画像カード生成） ---------- */
+
+const SHARE_CARD_SIZE = 360; // 出力解像度は scale 倍（3倍 = 1080x1080）
+const SHARE_CARD_SCALE = 3;
+
+function formatShareDate(createdAt) {
+  const d = new Date(createdAt);
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}/${pad(d.getMonth() + 1)}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function shareCardFontSize(text) {
+  const len = [...text].length;
+  if (len <= 25) return 30;
+  if (len <= 50) return 24;
+  if (len <= 90) return 19;
+  return 15;
+}
+
+function buildShareCardElement(post) {
+  const meta = categoryMeta(post);
+  const fontSize = shareCardFontSize(post.text);
+
+  const wrap = document.createElement('div');
+  wrap.className = 'share-card-render';
+  // 他の投稿情報が混ざらないよう、この投稿単体の情報のみで組み立てる
+  wrap.innerHTML = `
+    <div class="share-card-inner">
+      <div class="share-card-category">${meta.emoji} ${escapeHtml(meta.label)}</div>
+      <p class="share-card-text" style="font-size:${fontSize}px">${escapeHtml(post.text)}</p>
+      <div class="share-card-footnote">
+        <span>📍 辻堂</span>
+        <span>${formatShareDate(post.createdAt)}</span>
+      </div>
+    </div>
+    <div class="share-card-watermark">
+      <img src="logo.png" class="share-card-logo" alt="">
+      <span>みんツジで見つけた辻堂</span>
+    </div>
+  `;
+  return wrap;
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+async function handleShareClick(postId, btn) {
+  const post = posts.find((p) => p.id === postId);
+  if (!post) return;
+
+  if (typeof html2canvas !== 'function') {
+    showToast('シェア機能の読み込みに失敗しました。再読み込みしてください。');
+    return;
+  }
+
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '生成中…';
+
+  const cardEl = buildShareCardElement(post);
+  document.body.appendChild(cardEl);
+
+  try {
+    const canvas = await html2canvas(cardEl, {
+      width: SHARE_CARD_SIZE,
+      height: SHARE_CARD_SIZE,
+      scale: SHARE_CARD_SCALE,
+      backgroundColor: null,
+      useCORS: true,
+    });
+
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+    if (!blob) throw new Error('画像の生成に失敗しました');
+
+    const file = new File([blob], 'mintsuji-share.png', { type: 'image/png' });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        files: [file],
+        title: 'みんツジ',
+        text: 'みんツジで見つけた辻堂の投稿',
+      });
+    } else {
+      downloadBlob(blob, 'mintsuji-share.png');
+      showToast('画像をダウンロードしました。SNSアプリから投稿してください。');
+    }
+  } catch (e) {
+    if (e && e.name === 'AbortError') {
+      // ユーザーが共有シートをキャンセルした場合は何もしない
+    } else {
+      console.error('シェア画像の生成に失敗しました', e);
+      showToast('シェア画像の生成に失敗しました。もう一度お試しください。');
+    }
+  } finally {
+    cardEl.remove();
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+  }
 }
 
 function addMarker(post) {
