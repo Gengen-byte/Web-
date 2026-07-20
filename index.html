@@ -47,7 +47,7 @@
 <meta name="apple-mobile-web-app-title" content="みんツジ">
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link rel="stylesheet" href="style.css?v=9">
+<link rel="stylesheet" href="style.css?v=10">
 
 <script type="application/ld+json">
 {
@@ -138,6 +138,10 @@
     <header class="app-header">
       <div class="logo">
         <img src="logo.png" class="logo-icon" alt="みんツジ | みんなのツジドウ">
+        <span id="post-count-badge" class="post-count-badge" aria-live="polite">
+          <span class="post-count-dot" aria-hidden="true"></span>
+          今<span id="post-count-num">0</span>件投稿中
+        </span>
       </div>
       <p class="app-hint">地図をタップして、辻堂へのメッセージを残そう（24時間で消えます）</p>
       <nav class="app-header-links" aria-label="サイト内リンク">
@@ -316,7 +320,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="script.js?v=9"></script>
+<script src="script.js?v=10"></script>
 
 
 

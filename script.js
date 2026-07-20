@@ -108,6 +108,13 @@ function pruneExpiredLocal() {
     }
   });
   posts = stillValid;
+  updatePostCountBadge();
+}
+
+const postCountNumEl = document.getElementById('post-count-num');
+
+function updatePostCountBadge() {
+  if (postCountNumEl) postCountNumEl.textContent = posts.length;
 }
 
 /* ---------- 表示ヘルパー ---------- */
@@ -569,6 +576,8 @@ function handleSnapshot(snapshot) {
   expiredIds.forEach((id) => {
     postsCollection.doc(id).delete().catch(() => {});
   });
+
+  updatePostCountBadge();
 }
 
 authReady.then(() => {
