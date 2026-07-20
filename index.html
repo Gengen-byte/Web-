@@ -16,12 +16,23 @@
   })();
 </script>
 <title>みんツジ | 辻堂の今を地図でつなぐアプリ</title>
-<meta name="description" content="辻堂を舞台にした地図メッセージアプリ。地図上の好きな場所にメッセージを投稿して、今の辻堂をシェアできます。">
+<meta name="description" content="みんツジは神奈川県藤沢市・辻堂エリアの「今」を地図でゆるくシェアできる匿名メッセージアプリ。会員登録不要、投稿は24時間で消えます。お店情報やイベント、注意喚起などを地図上のピンで気軽に投稿・閲覧できます。">
+<link rel="canonical" href="https://gengen-byte.github.io/Web-/">
 
-<meta property="og:title" content="みんツジ">
-<meta property="og:description" content="辻堂を舞台にした地図メッセージアプリ">
+<meta property="og:title" content="みんツジ | 辻堂の今を地図でつなぐアプリ">
+<meta property="og:description" content="神奈川県藤沢市・辻堂エリアの「今」を地図でゆるくシェアする匿名メッセージアプリ。会員登録不要、投稿は24時間で消えます。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://gengen-byte.github.io/Web-/">
+<meta property="og:site_name" content="みんツジ">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://gengen-byte.github.io/Web-/icons/icon-512.png">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="みんツジ | 辻堂の今を地図でつなぐアプリ">
+<meta name="twitter:description" content="神奈川県藤沢市・辻堂エリアの「今」を地図でゆるくシェアする匿名メッセージアプリ。会員登録不要、投稿は24時間で消えます。">
+<meta name="twitter:image" content="https://gengen-byte.github.io/Web-/icons/icon-512.png">
 
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0C447C">
@@ -37,6 +48,87 @@
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="style.css?v=9">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "みんツジ",
+  "url": "https://gengen-byte.github.io/Web-/",
+  "description": "神奈川県藤沢市・辻堂エリアの「今」を地図でゆるくシェアできる匿名メッセージアプリ。会員登録不要、投稿は24時間で消えます。",
+  "applicationCategory": "SocialNetworkingApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "JPY"
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "個人情報は大丈夫？",
+      "acceptedAnswer": { "@type": "Answer", "text": "電話番号や住所、氏名などの個人情報らしき内容は、投稿時に自動で検知してブロックする仕組みになっています。安心して投稿してください。" }
+    },
+    {
+      "@type": "Question",
+      "name": "投稿はいつまで見られる？",
+      "acceptedAnswer": { "@type": "Answer", "text": "投稿から24時間が経過すると、自動的に表示が消えます。「今の辻堂」をシェアする、その場限りの気軽な投稿を楽しむアプリです。" }
+    },
+    {
+      "@type": "Question",
+      "name": "会員登録は必要？",
+      "acceptedAnswer": { "@type": "Answer", "text": "いいえ、必要ありません。ログイン画面などは表示されず、匿名のまま気軽に投稿・閲覧できます。" }
+    },
+    {
+      "@type": "Question",
+      "name": "投稿を削除したい場合は？",
+      "acceptedAnswer": { "@type": "Answer", "text": "自分で投稿した内容は、削除することができます。ただし、投稿した際に使用した端末からのみ削除が可能です（別の端末やブラウザからは削除できませんのでご注意ください）。" }
+    },
+    {
+      "@type": "Question",
+      "name": "どんな内容を投稿していいの？",
+      "acceptedAnswer": { "@type": "Answer", "text": "辻堂に関する話題であれば基本的に自由です。ただし、誹謗中傷や個人情報を含む投稿、違法な内容は禁止されており、フィルターで自動的にブロックされます。" }
+    },
+    {
+      "@type": "Question",
+      "name": "費用はかかりますか？",
+      "acceptedAnswer": { "@type": "Answer", "text": "無料でご利用いただけます。" }
+    },
+    {
+      "@type": "Question",
+      "name": "対応エリアはどこですか？",
+      "acceptedAnswer": { "@type": "Answer", "text": "神奈川県藤沢市の辻堂エリア（辻堂駅・辻堂海岸周辺）を中心とした地図を掲載しています。エリア内であればどこにでも投稿できます。" }
+    },
+    {
+      "@type": "Question",
+      "name": "写真も投稿できますか？",
+      "acceptedAnswer": { "@type": "Answer", "text": "はい。メッセージと合わせて写真を1枚添付できます。お店の様子やイベントの雰囲気などを写真付きで共有できます。" }
+    },
+    {
+      "@type": "Question",
+      "name": "投稿にカテゴリはありますか？",
+      "acceptedAnswer": { "@type": "Answer", "text": "「通常の投稿」「新店オープン」「お知らせ・注意」「イベント」の4種類から選んで投稿できます。新店オープンの投稿は7日間、それ以外は24時間で表示が消えます。" }
+    },
+    {
+      "@type": "Question",
+      "name": "スマホ・パソコンどちらでも使えますか？",
+      "acceptedAnswer": { "@type": "Answer", "text": "はい。スマートフォン・タブレット・パソコンのブラウザから利用できます。スマートフォンでは「ホーム画面に追加」することでアプリのように使うこともできます。" }
+    },
+    {
+      "@type": "Question",
+      "name": "アプリのインストールは必要ですか？",
+      "acceptedAnswer": { "@type": "Answer", "text": "いいえ、必要ありません。ブラウザでアクセスするだけですぐに利用を開始できます。" }
+    }
+  ]
+}
+</script>
 </head>
 <body>
 
@@ -77,15 +169,20 @@
   <main class="info-main">
     <section id="about" class="info-section">
       <h2>みんツジとは</h2>
-      <p>「みんツジ」は、辻堂の"今"を地図でゆるくシェアできるメッセージアプリです。</p>
+      <p>「みんツジ」は、神奈川県藤沢市・辻堂エリアの"今"を地図でゆるくシェアできる
+        匿名メッセージアプリです。</p>
       <p>地図上の気になる場所をタップするだけで、メッセージを投稿できます。
         「海がきれいだった」「このお店おすすめ」「近くでお祭りやってる」――
         そんな辻堂の何気ない瞬間を、地域のみんなで共有できます。</p>
-      <p>投稿は24時間で少しずつ薄れて消えていくので、いつも「今の辻堂」を
-        のぞいている感覚で楽しめます。個人情報や不適切な投稿は自動でブロック
-        されるので、安心して気軽に投稿できます。</p>
-      <p>辻堂に住んでいる人も、たまに訪れる人も、ぜひ地図を開いて
-        「今の辻堂」を覗いてみてください。</p>
+      <p>投稿には写真を添付したり、「新店オープン🎉」「お知らせ・注意⚠️」
+        「イベント🎪」などのカテゴリを付けることもできます。新店オープンの
+        投稿は7日間、それ以外は24時間かけて少しずつ薄れて消えていくので、
+        いつも「今の辻堂」をのぞいている感覚で楽しめます。</p>
+      <p>会員登録やログインは不要で、誰でもすぐに匿名のまま投稿・閲覧できます。
+        電話番号や住所などの個人情報らしき内容や、誹謗中傷・不適切な投稿は
+        自動でブロックされるので、安心して気軽に利用できます。</p>
+      <p>辻堂に住んでいる人も、辻堂海岸へ遊びに来た人も、たまたま辻堂駅を
+        通りかかった人も、ぜひ地図を開いて「今の辻堂」を覗いてみてください。</p>
     </section>
 
     <section id="faq" class="info-section">
@@ -126,6 +223,38 @@
       <div class="faq-item">
         <h3>Q. 費用はかかりますか？</h3>
         <p>A. 無料でご利用いただけます。</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Q. 対応エリアはどこですか？</h3>
+        <p>A. 神奈川県藤沢市の辻堂エリア（辻堂駅・辻堂海岸周辺）を中心とした
+          地図を掲載しています。エリア内であればどこにでも投稿できます。</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Q. 写真も投稿できますか？</h3>
+        <p>A. はい。メッセージと合わせて写真を1枚添付できます。
+          お店の様子やイベントの雰囲気などを写真付きで共有できます。</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Q. 投稿にカテゴリはありますか？</h3>
+        <p>A. 「通常の投稿📝」「新店オープン🎉」「お知らせ・注意⚠️」
+          「イベント🎪」の4種類から選んで投稿できます。新店オープンの投稿は
+          7日間、それ以外は24時間で表示が消えます。</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Q. スマホ・パソコンどちらでも使えますか？</h3>
+        <p>A. はい。スマートフォン・タブレット・パソコンのブラウザから
+          利用できます。スマートフォンでは「ホーム画面に追加」することで
+          アプリのように使うこともできます。</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Q. アプリのインストールは必要ですか？</h3>
+        <p>A. いいえ、必要ありません。ブラウザでアクセスするだけですぐに
+          利用を開始できます。</p>
       </div>
     </section>
   </main>
