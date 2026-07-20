@@ -165,6 +165,9 @@ function popupHtml(post) {
 
 /* ---------- 地図初期化 ---------- */
 
+const LIGHT_TILE_URL = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+const DARK_TILE_URL = 'https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png';
+
 const map = L.map('map', {
   zoomControl: false,
   maxBounds: TSUJIDO_BOUNDS,
@@ -172,11 +175,14 @@ const map = L.map('map', {
   minZoom: 14,
 }).setView(TSUJIDO_CENTER, 15);
 L.control.zoom({ position: 'topright' }).addTo(map);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-  attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-  maxZoom: 20,
-  subdomains: 'abcd',
-}).addTo(map);
+const tileLayer = L.tileLayer(
+  document.documentElement.classList.contains('dark-mode') ? DARK_TILE_URL : LIGHT_TILE_URL,
+  {
+    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+    maxZoom: 20,
+    subdomains: 'abcd',
+  }
+).addTo(map);
 
 /* ---------- 周辺施設: 小学校・中学校 ---------- */
 
@@ -654,6 +660,39 @@ shareClose.addEventListener('click', () => shareModal.classList.add('hidden'));
 shareModal.addEventListener('click', (e) => {
   if (e.target === shareModal) shareModal.classList.add('hidden');
 });
+
+/* ---------- ダークモード ---------- */
+
+const DARK_MODE_KEY = 'mintsuji_dark_mode';
+const themeToggleBtn = document.getElementById('theme-toggle-btn');
+const themeToggleIcon = document.getElementById('theme-toggle-icon');
+const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+
+function isDarkMode() {
+  return document.documentElement.classList.contains('dark-mode');
+}
+
+function applyDarkModeUi(isDark) {
+  tileLayer.setUrl(isDark ? DARK_TILE_URL : LIGHT_TILE_URL);
+  themeToggleIcon.textContent = isDark ? '☀️' : '🌙';
+  themeToggleBtn.setAttribute('aria-label', isDark ? 'ライトモードに切り替え' : 'ダークモードに切り替え');
+  if (themeColorMeta) themeColorMeta.setAttribute('content', isDark ? '#071627' : '#0C447C');
+}
+
+function setDarkMode(isDark) {
+  document.documentElement.classList.toggle('dark-mode', isDark);
+  try {
+    localStorage.setItem(DARK_MODE_KEY, isDark ? '1' : '0');
+  } catch (e) {
+    // localStorageが使えない場合は保存をスキップ（表示自体には影響しない）
+  }
+  applyDarkModeUi(isDark);
+}
+
+themeToggleBtn.addEventListener('click', () => setDarkMode(!isDarkMode()));
+
+// <head>のインラインスクリプトで初期クラスは反映済み。ここではタイル/アイコンを同期する。
+applyDarkModeUi(isDarkMode());
 
 /* ---------- 投稿モーダル ---------- */
 

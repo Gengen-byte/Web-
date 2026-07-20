@@ -5,6 +5,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="google-site-verification" content="-xmY6y44R5qY2fi86MBvWt6ad5lCP04-u3FLnnLxjsY" />
+<script>
+  // ダークモード設定を描画前に反映し、画面のちらつき（FOUC）を防ぐ
+  (function () {
+    try {
+      if (localStorage.getItem('mintsuji_dark_mode') === '1') {
+        document.documentElement.classList.add('dark-mode');
+      }
+    } catch (e) {}
+  })();
+</script>
 <title>みんツジ | 辻堂の今を地図でつなぐアプリ</title>
 <meta name="description" content="辻堂を舞台にした地図メッセージアプリ。地図上の好きな場所にメッセージを投稿して、今の辻堂をシェアできます。">
 
@@ -26,7 +36,7 @@
 <meta name="apple-mobile-web-app-title" content="みんツジ">
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link rel="stylesheet" href="style.css?v=6">
+<link rel="stylesheet" href="style.css?v=7">
 </head>
 <body>
 
@@ -55,6 +65,10 @@
     <button id="share-btn" class="share-btn" type="button" aria-label="みんツジを共有する">
       <span class="share-btn-icon">🔗</span>
       <span class="share-btn-label">QR</span>
+    </button>
+
+    <button id="theme-toggle-btn" class="theme-toggle-btn" type="button" aria-label="ダークモードに切り替え">
+      <span id="theme-toggle-icon">🌙</span>
     </button>
   </div>
 
@@ -173,7 +187,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="script.js?v=6"></script>
+<script src="script.js?v=7"></script>
 
 
 

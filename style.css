@@ -5,10 +5,35 @@
   --pastel-yellow: #fff2b2;
   --ink: #3d4f5c;
   --bg: #f4faff;
+  --surface: #ffffff;
+  --surface-soft: #f8fdff;
+  --surface-translucent: rgba(255, 255, 255, 0.88);
+  --surface-translucent-soft: rgba(255, 255, 255, 0.75);
+  --border-soft: #d9ecf3;
+  --text-secondary: #7c93a3;
+  --text-muted: #587184;
   --radius-lg: 24px;
   --radius-md: 16px;
   --radius-sm: 12px;
   --shadow: 0 6px 18px rgba(122, 170, 200, 0.25);
+  color-scheme: light;
+}
+
+/* ---------- ダークモード（みんツジロゴと同系の青トーン） ---------- */
+:root.dark-mode {
+  --pastel-blue: #1f4f76;
+  --pastel-blue-deep: #6fc3f7;
+  --ink: #dbe7f1;
+  --bg: #071627;
+  --surface: #102843;
+  --surface-soft: #16324f;
+  --surface-translucent: rgba(10, 30, 50, 0.88);
+  --surface-translucent-soft: rgba(255, 255, 255, 0.12);
+  --border-soft: #234d6e;
+  --text-secondary: #a9c2d4;
+  --text-muted: #8fadc2;
+  --shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
 }
 
 * {
@@ -23,6 +48,7 @@ html, body {
   background: var(--bg);
   color: var(--ink);
   scroll-behavior: smooth;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .visually-hidden {
@@ -54,12 +80,13 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  background: rgba(255, 255, 255, 0.88);
+  background: var(--surface-translucent);
   backdrop-filter: blur(6px);
   padding: 12px 18px;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
   max-width: 78vw;
+  transition: background 0.2s ease;
 }
 
 .app-header-links {
@@ -98,7 +125,7 @@ html, body {
 .app-hint {
   margin: 0;
   font-size: 12px;
-  color: #6d8394;
+  color: var(--text-secondary);
 }
 
 /* ---------- 地図 ---------- */
@@ -109,6 +136,11 @@ html, body {
   height: 100%;
   z-index: 1;
   filter: saturate(1.25) brightness(1.03);
+  transition: filter 0.2s ease;
+}
+
+.dark-mode #map {
+  filter: saturate(1.05) brightness(0.95);
 }
 
 .leaflet-tile-pane {
@@ -124,7 +156,7 @@ html, body {
 }
 
 .leaflet-control-zoom a {
-  background: #ffffff !important;
+  background: var(--surface) !important;
   color: var(--pastel-blue-deep) !important;
   font-size: 20px !important;
   font-weight: 800;
@@ -145,8 +177,18 @@ html, body {
 
 .leaflet-control-attribution {
   border-radius: var(--radius-sm) 0 0 0 !important;
-  background: rgba(255, 255, 255, 0.75) !important;
+  background: var(--surface-translucent-soft) !important;
   backdrop-filter: blur(4px);
+}
+
+.dark-mode .leaflet-control-attribution,
+.dark-mode .leaflet-control-attribution a {
+  color: var(--ink) !important;
+}
+
+.dark-mode .leaflet-popup-content-wrapper,
+.dark-mode .leaflet-popup-tip {
+  background: var(--surface) !important;
 }
 
 /* ---------- 投稿モーダル ---------- */
@@ -166,7 +208,7 @@ html, body {
 }
 
 .modal-card {
-  background: #ffffff;
+  background: var(--surface);
   border-radius: var(--radius-lg);
   padding: 22px;
   width: 90%;
@@ -189,9 +231,9 @@ html, body {
 }
 
 .category-btn {
-  border: 2px solid #d9ecf3;
-  background: #f8fdff;
-  color: #7c93a3;
+  border: 2px solid var(--border-soft);
+  background: var(--surface-soft);
+  color: var(--text-secondary);
   border-radius: 999px;
   padding: 8px 10px;
   font-size: 12.5px;
@@ -232,13 +274,14 @@ html, body {
   width: 100%;
   min-height: 100px;
   border-radius: var(--radius-md);
-  border: 2px solid #d9ecf3;
+  border: 2px solid var(--border-soft);
   padding: 12px;
   font-size: 14px;
   resize: none;
   outline: none;
   font-family: inherit;
-  background: #f8fdff;
+  background: var(--surface-soft);
+  color: var(--ink);
 }
 
 .modal-card textarea:focus {
@@ -248,7 +291,7 @@ html, body {
 .char-count {
   text-align: right;
   font-size: 11px;
-  color: #93a8b6;
+  color: var(--text-secondary);
   margin-top: 4px;
 }
 
@@ -260,7 +303,7 @@ html, body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #eef6f9;
+  background: var(--surface-soft);
   color: var(--pastel-blue-deep);
   padding: 8px 14px;
   border-radius: 999px;
@@ -304,7 +347,7 @@ html, body {
   height: 24px;
   border: 2px solid var(--pastel-blue);
   border-radius: 50%;
-  background: #ffffff;
+  background: var(--surface);
   color: var(--ink);
   font-size: 12px;
   font-weight: 700;
@@ -355,8 +398,8 @@ html, body {
 }
 
 .btn-secondary {
-  background: #eef6f9;
-  color: #7c93a3;
+  background: var(--surface-soft);
+  color: var(--text-secondary);
 }
 
 /* ---------- ピン / ポップアップ ---------- */
@@ -502,6 +545,11 @@ html, body {
   min-width: 200px;
 }
 
+/* ダークモードでは投稿カードの配色をカテゴリ色より優先して暗いトーンに統一 */
+.dark-mode .mintsuji-popup {
+  background: var(--surface) !important;
+}
+
 .mintsuji-popup .popup-photo {
   display: block;
   width: 100%;
@@ -517,11 +565,12 @@ html, body {
   margin: 0 0 8px;
   white-space: pre-wrap;
   word-break: break-word;
+  color: var(--ink);
 }
 
 .mintsuji-popup .popup-meta {
   font-size: 11px;
-  color: #587184;
+  color: var(--text-muted);
   margin-bottom: 8px;
 }
 
@@ -534,7 +583,7 @@ html, body {
 .reaction-btn {
   border: none;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.75);
+  background: var(--surface-translucent-soft);
   padding: 6px 10px;
   font-size: 13px;
   cursor: pointer;
@@ -557,7 +606,7 @@ html, body {
 .popup-delete-btn {
   border: none;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.75);
+  background: var(--surface-translucent-soft);
   padding: 6px 10px;
   font-size: 12px;
   font-weight: 700;
@@ -575,7 +624,7 @@ html, body {
 .popup-share-btn {
   border: none;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.75);
+  background: var(--surface-translucent-soft);
   padding: 6px 10px;
   font-size: 12px;
   font-weight: 700;
@@ -684,7 +733,7 @@ html, body {
   align-items: center;
   gap: 8px;
   border: none;
-  background: linear-gradient(135deg, #ffffff, #eef8fc);
+  background: linear-gradient(135deg, var(--surface), var(--surface-soft));
   color: var(--pastel-blue-deep);
   padding: 12px 18px;
   border-radius: 999px;
@@ -738,7 +787,7 @@ html, body {
   align-items: center;
   gap: 8px;
   border: none;
-  background: linear-gradient(135deg, #ffffff, #eef8fc);
+  background: linear-gradient(135deg, var(--surface), var(--surface-soft));
   color: var(--pastel-blue-deep);
   padding: 12px 18px;
   border-radius: 999px;
@@ -774,7 +823,7 @@ html, body {
 
 .share-desc {
   font-size: 13px;
-  color: #587184;
+  color: var(--text-muted);
   margin: 0 0 14px;
 }
 
@@ -784,12 +833,12 @@ html, body {
   border-radius: var(--radius-md);
   border: 3px solid var(--pastel-blue);
   padding: 8px;
-  background: #ffffff;
+  background: var(--surface);
 }
 
 .share-url {
   font-size: 12px;
-  color: #7c93a3;
+  color: var(--text-secondary);
   margin: 12px 0 0;
   word-break: break-all;
 }
@@ -816,6 +865,41 @@ html, body {
   opacity: 0;
   pointer-events: none;
   transform: translateX(-50%) translateY(8px);
+}
+
+/* ---------- ダークモード切り替えボタン ---------- */
+.theme-toggle-btn {
+  position: absolute;
+  top: 100px;
+  right: 16px;
+  z-index: 1000;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--surface), var(--surface-soft));
+  color: var(--pastel-blue-deep);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform 0.12s ease, background 0.2s ease;
+}
+
+.theme-toggle-btn:active {
+  transform: scale(0.9);
+}
+
+@media (max-width: 480px) {
+  .theme-toggle-btn {
+    top: 90px;
+    right: 14px;
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
 }
 
 /* ---------- 現在地マーカー ---------- */
@@ -899,7 +983,7 @@ html, body {
 }
 
 .faq-item {
-  background: #ffffff;
+  background: var(--surface);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow);
   padding: 16px 18px;
@@ -916,5 +1000,5 @@ html, body {
   margin: 0;
   font-size: 14px;
   line-height: 1.8;
-  color: #587184;
+  color: var(--text-muted);
 }
