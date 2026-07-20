@@ -21,18 +21,18 @@
 
 /* ---------- ダークモード（みんツジロゴと同系の青トーン） ---------- */
 :root.dark-mode {
-  --pastel-blue: #1f4f76;
-  --pastel-blue-deep: #6fc3f7;
-  --ink: #dbe7f1;
-  --bg: #071627;
-  --surface: #102843;
-  --surface-soft: #16324f;
-  --surface-translucent: rgba(10, 30, 50, 0.88);
-  --surface-translucent-soft: rgba(255, 255, 255, 0.12);
-  --border-soft: #234d6e;
-  --text-secondary: #a9c2d4;
-  --text-muted: #8fadc2;
-  --shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+  --pastel-blue: #2c5f86;
+  --pastel-blue-deep: #7bcbfa;
+  --ink: #eaf2f9;
+  --bg: #14324c;
+  --surface: #1c3f5e;
+  --surface-soft: #234a6c;
+  --surface-translucent: rgba(28, 63, 94, 0.9);
+  --surface-translucent-soft: rgba(255, 255, 255, 0.16);
+  --border-soft: #3a6386;
+  --text-secondary: #c2d7e6;
+  --text-muted: #a4c0d4;
+  --shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
   color-scheme: dark;
 }
 
@@ -140,7 +140,7 @@ html, body {
 }
 
 .dark-mode #map {
-  filter: saturate(1.05) brightness(0.95);
+  filter: saturate(1.05) brightness(1.15) contrast(0.95);
 }
 
 .leaflet-tile-pane {
