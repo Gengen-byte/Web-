@@ -17,7 +17,14 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
+const storage = firebase.storage();
 const postsCollection = db.collection('posts');
+const postPhotosRef = storage.ref('post-photos');
+
+function deletePostAndPhoto(id) {
+  postsCollection.doc(id).delete().catch(() => {});
+  postPhotosRef.child(`${id}.jpg`).delete().catch(() => {});
+}
 
 let currentUid = null;
 const authReady = auth.signInAnonymously()
@@ -102,7 +109,7 @@ function pruneExpiredLocal() {
     if (now >= post.expiresAt) {
       removeMarkerById(post.id);
       previousReactionTotals.delete(post.id);
-      postsCollection.doc(post.id).delete().catch(() => {});
+      deletePostAndPhoto(post.id);
     } else {
       stillValid.push(post);
     }
@@ -148,8 +155,9 @@ function popupHtml(post) {
   const categoryTag = isSpecial
     ? `<div class="popup-category-tag" style="background:${meta.tagBg};color:${meta.tagColor}">${meta.emoji} ${meta.label}</div>`
     : '';
-  const photoHtml = post.photo
-    ? `<img class="popup-photo" src="${post.photo}" alt="投稿された写真">`
+  const photoSrc = post.photoUrl || post.photo;
+  const photoHtml = photoSrc
+    ? `<img class="popup-photo" src="${photoSrc}" alt="投稿された写真" loading="lazy">`
     : '';
   const deleteHtml = post.ownerId === currentUid
     ? `<button class="popup-delete-btn" data-id="${post.id}" aria-label="投稿を削除">🗑 削除</button>`
@@ -340,7 +348,7 @@ function bubbleIcon(post) {
   const categoryClass = isSpecial ? meta.bubbleClass : '';
   const bgStyle = isSpecial ? '' : `background:rgba(163, 216, 244, ${ageAlpha(post.createdAt)});`;
   const hotBadge = popularClass === 'is-hot' ? '<span class="mintsuji-bubble-badge">🔥</span>' : '';
-  const photoBadge = post.photo ? '<span class="mintsuji-bubble-photo-badge">📷</span>' : '';
+  const photoBadge = (post.photoUrl || post.photo) ? '<span class="mintsuji-bubble-photo-badge">📷</span>' : '';
   const previewText = escapeHtml(bubblePreview(post.text));
   const displayText = isSpecial ? `${meta.emoji} ${previewText}` : previewText;
   return L.divIcon({
@@ -385,6 +393,7 @@ function attachReactionHandlers(marker, postId) {
 
 function deletePost(id) {
   if (!confirm('この投稿を削除しますか？この操作は取り消せません。')) return;
+  postPhotosRef.child(`${id}.jpg`).delete().catch(() => {});
   postsCollection.doc(id).delete().catch((e) => {
     console.error('削除に失敗しました', e);
     showToast('削除に失敗しました。もう一度お試しください。');
@@ -573,9 +582,7 @@ function handleSnapshot(snapshot) {
     upsertMarkerFromPost(post);
   });
 
-  expiredIds.forEach((id) => {
-    postsCollection.doc(id).delete().catch(() => {});
-  });
+  expiredIds.forEach(deletePostAndPhoto);
 
   updatePostCountBadge();
 }
@@ -728,7 +735,7 @@ const PHOTO_MAX_DIMENSION = 720;
 const PHOTO_QUALITY = 0.7;
 
 let pendingLatLng = null;
-let pendingPhotoDataUrl = null;
+let pendingPhotoBlob = null;
 let pendingCategory = 'normal';
 
 function setPendingCategory(category) {
@@ -741,6 +748,8 @@ function setPendingCategory(category) {
 categoryButtons.forEach((btn) => {
   btn.addEventListener('click', () => setPendingCategory(btn.dataset.category));
 });
+
+const PHOTO_MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB超の元画像は読み込み前に弾く
 
 function resizeImageFile(file) {
   return new Promise((resolve, reject) => {
@@ -756,7 +765,14 @@ function resizeImageFile(file) {
         canvas.height = Math.round(img.height * scale);
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL('image/jpeg', PHOTO_QUALITY));
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) { reject(new Error('画像の変換に失敗しました')); return; }
+            resolve({ blob, dataUrl: canvas.toDataURL('image/jpeg', PHOTO_QUALITY) });
+          },
+          'image/jpeg',
+          PHOTO_QUALITY
+        );
       };
       img.src = reader.result;
     };
@@ -765,7 +781,7 @@ function resizeImageFile(file) {
 }
 
 function clearPendingPhoto() {
-  pendingPhotoDataUrl = null;
+  pendingPhotoBlob = null;
   postPhotoInput.value = '';
   photoPreview.src = '';
   photoPreviewWrap.classList.add('hidden');
@@ -775,9 +791,16 @@ postPhotoInput.addEventListener('change', async () => {
   const file = postPhotoInput.files[0];
   if (!file) return;
 
+  if (file.size > PHOTO_MAX_FILE_SIZE) {
+    showToast('写真のファイルサイズが大きすぎます（20MBまで）。別の写真でお試しください。');
+    clearPendingPhoto();
+    return;
+  }
+
   try {
-    pendingPhotoDataUrl = await resizeImageFile(file);
-    photoPreview.src = pendingPhotoDataUrl;
+    const { blob, dataUrl } = await resizeImageFile(file);
+    pendingPhotoBlob = blob;
+    photoPreview.src = dataUrl;
     photoPreviewWrap.classList.remove('hidden');
   } catch (e) {
     console.warn('写真の処理に失敗しました', e);
@@ -857,7 +880,7 @@ postSubmit.addEventListener('click', async () => {
     lat: pendingLatLng.lat,
     lng: pendingLatLng.lng,
     text,
-    photo: pendingPhotoDataUrl,
+    photoUrl: null,
     category,
     createdAt,
     expiresAt: createdAt + CATEGORY_META[category].expiryMs,
@@ -867,6 +890,11 @@ postSubmit.addEventListener('click', async () => {
 
   postSubmit.disabled = true;
   try {
+    if (pendingPhotoBlob) {
+      const photoRef = postPhotosRef.child(`${post.id}.jpg`);
+      await photoRef.put(pendingPhotoBlob, { contentType: 'image/jpeg' });
+      post.photoUrl = await photoRef.getDownloadURL();
+    }
     await postsCollection.doc(post.id).set(post);
     closeModal();
   } catch (e) {
