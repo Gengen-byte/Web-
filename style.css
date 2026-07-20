@@ -435,6 +435,15 @@ html, body {
   color: var(--text-secondary);
 }
 
+.btn-line {
+  background: #06c755;
+  color: #ffffff;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  box-shadow: 0 4px 10px rgba(6, 199, 85, 0.4);
+}
+
 /* ---------- ピン / ポップアップ ---------- */
 .mintsuji-bubble-wrap {
   position: relative;
@@ -898,6 +907,61 @@ html, body {
   opacity: 0;
   pointer-events: none;
   transform: translateX(-50%) translateY(8px);
+}
+
+/* ---------- ホーム画面追加バナー ---------- */
+.install-banner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px));
+  background: var(--surface);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15);
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.install-banner.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(100%);
+}
+
+.install-banner-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.install-banner-text {
+  flex: 1;
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+.install-banner-action {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  font-size: 13px;
+}
+
+.install-banner-action.hidden {
+  display: none;
+}
+
+.install-banner-close {
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
 }
 
 /* ---------- ダークモード切り替えボタン ---------- */

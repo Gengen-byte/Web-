@@ -47,7 +47,7 @@
 <meta name="apple-mobile-web-app-title" content="みんツジ">
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link rel="stylesheet" href="style.css?v=10">
+<link rel="stylesheet" href="style.css?v=11">
 
 <script type="application/ld+json">
 {
@@ -170,6 +170,15 @@
 
   <div id="toast" class="toast hidden"></div>
 
+  <div id="install-banner" class="install-banner hidden">
+    <span class="install-banner-icon">📲</span>
+    <p class="install-banner-text" id="install-banner-text">
+      みんツジをホーム画面に追加すると、次からアプリのようにすぐ開けます
+    </p>
+    <button id="install-banner-action" class="btn btn-primary install-banner-action hidden" type="button">追加する</button>
+    <button id="install-banner-close" class="install-banner-close" type="button" aria-label="閉じる">✕</button>
+  </div>
+
   <main class="info-main">
     <section id="about" class="info-section">
       <h2>みんツジとは</h2>
@@ -271,6 +280,7 @@
       <img class="share-qr" src="qr-code.png" alt="みんツジのQRコード">
       <p class="share-url">https://gengen-byte.github.io/Web-/</p>
       <div class="modal-actions">
+        <a id="share-line-btn" class="btn btn-line" href="#" target="_blank" rel="noopener noreferrer">💬 LINEで送る</a>
         <button id="share-close" class="btn btn-secondary">閉じる</button>
       </div>
     </div>
@@ -320,7 +330,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="script.js?v=10"></script>
+<script src="script.js?v=11"></script>
 
 
 

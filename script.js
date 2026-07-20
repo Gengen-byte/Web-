@@ -663,6 +663,13 @@ locateBtn.addEventListener('click', handleLocateClick);
 const shareBtn = document.getElementById('share-btn');
 const shareModal = document.getElementById('share-modal');
 const shareClose = document.getElementById('share-close');
+const shareLineBtn = document.getElementById('share-line-btn');
+
+if (shareLineBtn) {
+  const appUrl = 'https://gengen-byte.github.io/Web-/';
+  const lineShareText = 'みんツジ - 辻堂の今を地図でつなぐアプリ';
+  shareLineBtn.href = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(appUrl)}&text=${encodeURIComponent(lineShareText)}`;
+}
 
 shareBtn.addEventListener('click', () => shareModal.classList.remove('hidden'));
 shareClose.addEventListener('click', () => shareModal.classList.add('hidden'));
@@ -869,3 +876,64 @@ postSubmit.addEventListener('click', async () => {
     postSubmit.disabled = false;
   }
 });
+
+/* ---------- ホーム画面追加バナー ---------- */
+
+const INSTALL_BANNER_DISMISS_KEY = 'mintsuji_install_banner_dismissed';
+const INSTALL_BANNER_DISMISS_DAYS = 14;
+
+const installBanner = document.getElementById('install-banner');
+const installBannerText = document.getElementById('install-banner-text');
+const installBannerAction = document.getElementById('install-banner-action');
+const installBannerClose = document.getElementById('install-banner-close');
+
+let deferredInstallPrompt = null;
+
+function isStandaloneDisplay() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
+function isInstallBannerDismissed() {
+  const dismissedAt = Number(localStorage.getItem(INSTALL_BANNER_DISMISS_KEY) || 0);
+  if (!dismissedAt) return false;
+  const elapsedDays = (Date.now() - dismissedAt) / (24 * 60 * 60 * 1000);
+  return elapsedDays < INSTALL_BANNER_DISMISS_DAYS;
+}
+
+function dismissInstallBanner() {
+  installBanner.classList.add('hidden');
+  try {
+    localStorage.setItem(INSTALL_BANNER_DISMISS_KEY, String(Date.now()));
+  } catch (e) {}
+}
+
+function showInstallBanner() {
+  if (isStandaloneDisplay() || isInstallBannerDismissed()) return;
+  installBanner.classList.remove('hidden');
+}
+
+const isIOSDevice = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+if (isIOSDevice) {
+  installBannerText.textContent = 'みんツジをホーム画面に追加すると、次からアプリのようにすぐ開けます。共有ボタンから「ホーム画面に追加」をタップ';
+  setTimeout(showInstallBanner, 3000);
+} else {
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    installBannerAction.classList.remove('hidden');
+    setTimeout(showInstallBanner, 3000);
+  });
+}
+
+installBannerAction.addEventListener('click', async () => {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  dismissInstallBanner();
+});
+
+installBannerClose.addEventListener('click', dismissInstallBanner);
+
+window.addEventListener('appinstalled', dismissInstallBanner);
